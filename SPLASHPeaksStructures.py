@@ -36,11 +36,12 @@ def settings():
     inReadsA   = ["merged_peak_tables_final"]*len(inGenomesA)
     inGenomesB = ["WyNAUdsub", "WyNAwt"]
     inReadsB   = ["PR8-Wy_merged_peak_tables"]*len(inGenomesB)
+    pfx, fsa, stb = list(), list(), list()
     for infasta,inSPLASH in zip(inGenomesA+inGenomesB,inReadsA+inReadsB):
-        opt["pfx"] = os.path.join(mainDir,"results","SPLASHPeaksStructures",infasta) # output prefix
-        opt["fsa"] = os.path.join(mainDir,"data",f"{infasta}.fa")                    # fasta genome file
-        opt["stb"] = os.path.join(mainDir,"data",f"{inSPLASH}.tsv")                  # SPLASH table file
-    return opt
+        pfx.append(os.path.join(mainDir,"results","SPLASHPeaksStructures",infasta)) # output prefix
+        fsa.append(os.path.join(mainDir,"data",f"{infasta}.fa"))                    # fasta genome file
+        stb.append(os.path.join(mainDir,"data",f"{inSPLASH}.tsv"))                  # SPLASH table file
+    return opt, pfx, fsa, stb
 
 
 
@@ -178,6 +179,7 @@ def extractReads(tlist, fasta_dict, opt):
         constraint = f"{'<'*(lk.aj-lk.ai)}{'>'*(lk.bj-lk.bi)}"
         lk.mfe, pattern = doCofold(lk.RNA, constraint, opt)
         lk.structure = pattern[:len(lk.RNA.split("&")[0])]+"&"+pattern[len(lk.RNA.split("&")[0]):]
+        new_tlist.append(lk)
     return new_tlist
 
 def doCofold(RNA, constraint, opt):
@@ -233,5 +235,8 @@ if __name__ == "__main__":
 
     ############################################################################
     ## main
-    copt = options(**settings())
-    main(copt)
+    opt, pfx, fsa, stb = settings()
+    for p,f,s in zip(pfx,fsa,stb):
+        opt["pfx"], opt["fsa"], opt["stb"] = p, f, s
+        copt = options(**opt) 
+        main(copt)
