@@ -215,8 +215,8 @@ def writeTable(tlist, header, opt):
 
 def makeDir(opt):
     ## create directory
-    if not os.path.isdir(opt.pfx):
-        os.mkdir(opt.pfx)
+    if not os.path.exists(opt.pfx):
+        os.makedirs(opt.pfx)
 
 
 
